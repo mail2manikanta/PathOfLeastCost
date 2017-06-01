@@ -42,6 +42,10 @@ class Matrix<T> {
     
     init?(_ data:Array<T>, rows:Int, columns:Int) {
         
+        if (rows <= 0 || columns <= 0) {
+            return nil
+        }
+        
         if data.count != rows*columns {
             return nil
         }

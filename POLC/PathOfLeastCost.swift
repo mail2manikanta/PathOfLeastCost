@@ -70,11 +70,6 @@ class PathOfLeastCost {
         let rows = matrix.rows
         let columns = matrix.columns
         
-        // Check for empty rows or columns in the given matrix
-        if (rows == 0 || columns == 0) {
-            return .invalidData
-        }
-        
         /** The costMatrix represents the cost to reach any particular element in the given matrix
             Initialize the costMatrix with zero values
         */

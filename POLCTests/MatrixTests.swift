@@ -26,6 +26,12 @@ class MatrixTests: XCTestCase {
         XCTAssert(matrix == nil, "Invalid rows and columns count")
     }
     
+    func testMatrixWithNegativeRowsAndColumns() {
+        let matrix:Matrix<Int>? = Matrix([1, 2, 3, 4, 8, 2, 1, 5, 3], rows:-3, columns:-3)
+        XCTAssert(matrix == nil, "Invalid rows and columns count")
+    }
+
+    
     func testMatrixWithValidData() {
         let matrix:Matrix<Int>? = Matrix([1, 2, 3, 4, 8, 2, 1, 5, 3], rows:3, columns:3)
         XCTAssert(matrix != nil, "Valid rows and columns count")
