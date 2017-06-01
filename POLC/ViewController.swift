@@ -13,7 +13,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
         var matrix = Matrix([3, 4, 1, 2, 8, 6, 6, 1, 8, 2, 7, 4, 5, 9, 3, 9, 9, 5, 8, 4, 1, 3, 2, 6, 3, 7, 2, 8, 6, 4], rows:5, columns:6)
         findPathOf(matrix: matrix)
 
@@ -51,6 +50,9 @@ class ViewController: UIViewController {
         findPathOf(matrix: matrix)
     }
     
+/**
+     Checks for the path status and prints the output in the specifed format
+*/
     func findPathOf(matrix:Matrix<Int>?) {
         let polc = PathOfLeastCost()
         let pathStatus:PathStatus = polc.calculateLeastPath(on: matrix)
