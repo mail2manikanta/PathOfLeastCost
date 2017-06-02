@@ -8,46 +8,107 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+extension String {
+    
+    subscript (i: Int) -> Character {
+        return self[index(startIndex, offsetBy: i)]
+    }
+}
 
+class ViewController: UIViewController {
+    @IBOutlet weak private var textViewMatrixInput:UITextView!
+    @IBOutlet weak private var lblPathOutput:UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
+    
+    @IBAction func clickedGetPathBtn(sender: UIButton) {
+        // Parse the input matrix
+        guard let matrix = parseMatrixInput() else {
+            lblPathOutput.text = "Invalid matrix\n"
+            return
+        }
         
-        var matrix = Matrix([3, 4, 1, 2, 8, 6, 6, 1, 8, 2, 7, 4, 5, 9, 3, 9, 9, 5, 8, 4, 1, 3, 2, 6, 3, 7, 2, 8, 6, 4], rows:5, columns:6)
+        // The matrix is valid, get the least path
         findPathOf(matrix: matrix)
-
-        matrix = Matrix([3, 4, 1, 2, 8, 6, 6, 1, 8, 2, 7, 4, 5, 9, 3, 9, 9, 5, 8, 4, 1, 3, 2, 6, 3, 7, 2, 1, 2, 3], rows:5, columns:6)
-        findPathOf(matrix: matrix)
-
-        matrix = Matrix([19, 10, 19, 10, 19, 21, 23, 20, 19, 12, 20, 12, 20, 11, 10], rows:3, columns:5)
-        findPathOf(matrix: matrix)
+    }
+    
+/**     Parses the string entered in the textView and converts the same if valid into an instance of Matrix
+            Returns - (Matrix) If success it will return the number otherwise it nil
+*/
+    func parseMatrixInput() -> Matrix<Int>? {
+        // Separate the given string with whitespace separator
+        let inputTexts = textViewMatrixInput.text.components(separatedBy: .whitespaces)
         
-        matrix = Matrix([5, 8, 5, 3, 5], rows:1, columns:5)
-        findPathOf(matrix: matrix)
+        var prevColumnCounter = 0
+        var columnCounter = 0
+        var rowCounter = 1
+        var inputNumbers = Array<Int>()
+        
+        // Go through the strings
+        for i in 0..<inputTexts.count {
+            let inputText = inputTexts[i]
+            
+            // Sometimes I get empty strings, filtering them out
+            if (inputText == "") {
+                continue
+            }
+            
+            // Separate the given string with newline separator
+            let newLineStrings = inputText.components(separatedBy: .newlines)
 
-        matrix = Matrix([5, 8, 5, 3, 5], rows:5, columns:1)
-        findPathOf(matrix: matrix)
-
-        matrix = Matrix<Int>([], rows:0, columns:0)
-        findPathOf(matrix: matrix)
-
-        matrix = Matrix([69, 10, 19, 10, 19, 51, 23, 20, 19, 12, 60, 12, 20, 11, 10], rows:3, columns:5)
-        findPathOf(matrix: matrix)
-
-        matrix = Matrix([60, 3, 3, 6, 6, 3, 7, 9, 5, 6, 8, 3], rows:3, columns:4)
-        findPathOf(matrix: matrix)
-
-        matrix = Matrix([6, 3, -5, 9, -5, 2, 4, 10, 3, -2, 6, 10, 6, -1, -2, 10], rows:4, columns:4)
-        findPathOf(matrix: matrix)
-
-        matrix = Matrix([51, 51, 0, 51, 51, 51, 5, 5], rows:4, columns:2)
-        findPathOf(matrix: matrix)
-
-        matrix = Matrix([51, 51, 51, 0, 51, 51, 51, 51, 51, 5, 5, 51], rows:4, columns:3)
-        findPathOf(matrix: matrix)
-
-        matrix = Matrix([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], rows:1, columns:20)
-        findPathOf(matrix: matrix)
+            // Handle strings with newlines
+            if newLineStrings.count > 1 {
+                // Sometimes I get empty strings, filtering them out
+                if (newLineStrings[0] != "") {
+                    let (isValid, number) = isValidInteger(string: newLineStrings[0])
+                    if isValid == false {
+                        return nil
+                    }
+                    inputNumbers.append(number)
+                    columnCounter = columnCounter + 1
+                    
+                    if (prevColumnCounter != 0 && prevColumnCounter != columnCounter) {
+                        return nil
+                    }
+                    prevColumnCounter = columnCounter
+                }
+                
+                // Sometimes I get empty strings, filtering them out
+                if newLineStrings[1] != "" {
+                    rowCounter = rowCounter + 1
+                    let (isNumValid, num) = isValidInteger(string: newLineStrings[1])
+                    if isNumValid == false {
+                        return nil
+                    }
+                    inputNumbers.append(num)
+                    columnCounter = 1
+                }
+            }
+            else {
+                let (isValid, number) = isValidInteger(string: inputText)
+                if isValid == false {
+                    return nil
+                }
+                inputNumbers.append(number)
+                columnCounter = columnCounter + 1
+            }
+        }
+        return Matrix<Int>(inputNumbers, rows: rowCounter, columns: columnCounter)
+    }
+    
+/** Checks whether the input string can be converted to integer
+        Returns - (Bool, Int) If success it will return the number otherwise it returns (false, -1)
+ */
+    func isValidInteger(string:String) -> (Bool, Int) {
+        var isValid:Bool = false
+        if let number =  Int(string) {
+            isValid = true
+            return (isValid, number)
+        }
+        
+        return (isValid, -1)
     }
     
 /**
@@ -59,11 +120,11 @@ class ViewController: UIViewController {
         
         switch pathStatus {
         case .invalidData:
-            print("Invalid matrix")
+            lblPathOutput.text = "Invalid matrix\n"
         case .pathFound(let cost, let path):
-            print("YES\n\(cost)\n\(path)")
+            lblPathOutput.text = "YES\n\(cost)\n\(path)"
         case .pathNotFound(let cost, let path):
-            print("NO\n\(cost)\n\(path)")
+            lblPathOutput.text = "NO\n\(cost)\n\(path)"
         }
     }
 
@@ -71,6 +132,8 @@ class ViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    
 
 
 }
